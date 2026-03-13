@@ -24,5 +24,6 @@
     "react-native-svg": "^15.15.3",
     "react-native-web": "^0.21.0"
   },
-  "private": true
+  "private": true,
+  "homepage": "https://luisalvaradodev10s.github.io/mora-protein/"
 }
