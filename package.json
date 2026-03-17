@@ -25,5 +25,8 @@
     "react-native-web": "^0.21.0"
   },
   "private": true,
-  "homepage": "https://luisalvaradodev10s.github.io/mora-protein/"
+  "homepage": "https://luisalvaradodev10s.github.io/mora-protein/",
+  "devDependencies": {
+    "gh-pages": "^6.3.0"
+  }
 }
