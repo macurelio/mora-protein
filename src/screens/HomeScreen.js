@@ -23,12 +23,9 @@ export default function HomeScreen({ navigation }) {
       <TouchableOpacity style={styles.card} onPress={() => navigation.navigate('ProductDetail', { product: item })}>
         <View style={styles.imageContainer}>
           <Image
-            source={
-              typeof item.image === 'number'
-                ? item.image
-                : { uri: item.image }
-            }
+            source={item.image}
             style={styles.productImage}
+            resizeMode="contain"
           />
           <View style={styles.overlay} />
         </View>
@@ -229,7 +226,6 @@ const styles = StyleSheet.create({
     width: '100%',
     height: 150,
     backgroundColor: '#F0F0F0',
-    resizeMode: 'cover',
   },
   overlay: {
     display: 'none',
