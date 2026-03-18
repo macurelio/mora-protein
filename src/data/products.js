@@ -4,39 +4,55 @@ export const products = [
     name: 'Galletón de Avena',
     description: 'Chips de chocolate • 10g Proteína • Sin azúcar',
     price: 900,
-    image: 'https://images.unsplash.com/photo-1499636136210-6f4ee915583e?w=500&q=80', // Galleta de avena referencial
+    image: require('../../assets/imagen-horizontal-de.png'),
     category: 'Galletas'
   },
   {
     id: '2',
-    name: 'Twix Tiramisú',
-    description: 'Dulce de leche • 15g Proteína • Sin azúcar',
+    name: 'Barra Tiramisú (Chocolate Negro)',
+    description: '15g Proteína • Sin azúcar • Cobertura Chocolate Negro',
     price: 1900,
-    image: 'https://placehold.co/600x400/3A2C24/FFFFFF/png?text=Twix+Tiramisu', // Cambio provisorio a imagen fija
+    image: require('../../assets/barras.jpg'),
     category: 'Barras'
   },
   {
     id: '3',
-    name: 'Barra Cacao y Maní',
-    description: '15g Proteína • Sin azúcar',
+    name: 'Barra Tiramisú (Chocolate Blanco)',
+    description: '15g Proteína • Sin azúcar • Cobertura Chocolate Blanco',
     price: 1900,
-    image: 'https://images.unsplash.com/photo-1603569283847-aa295f0d016a?w=500&q=80', // Barra cacao referencial
+    image: require('../../assets/barras.jpg'),
     category: 'Barras'
   },
   {
     id: '4',
-    name: 'Barra Coco',
-    description: '15g Proteína • Sin azúcar',
+    name: 'Barra Chocolate Naranja (Chocolate Negro)',
+    description: '15g Proteína • Sin azúcar • Cobertura Chocolate Negro',
     price: 1900,
-    image: 'https://placehold.co/600x400/F0EBE1/5C4033/png?text=Barra+Coco', // Cambio provisorio a imagen fija
+    image: require('../../assets/barras.jpg'),
     category: 'Barras'
   },
   {
     id: '5',
-    name: 'Twix Chocolate Cinnamon',
-    description: 'Chocolate • canela • 15g Proteína • Sin azúcar',
+    name: 'Barra Chocolate Naranja (Chocolate Blanco)',
+    description: '15g Proteína • Sin azúcar • Cobertura Chocolate Blanco',
     price: 1900,
-    image: 'https://images.unsplash.com/photo-1549007953-2f2dc0b24019?w=500&q=80', // Textura barra referencial
+    image: require('../../assets/barras.jpg'),
+    category: 'Barras'
+  },
+  {
+    id: '6',
+    name: 'Barra Chocolate Cinnamon (Chocolate Negro)',
+    description: '15g Proteína • Sin azúcar • Cobertura Chocolate Negro',
+    price: 1900,
+    image: require('../../assets/barras.jpg'),
+    category: 'Barras'
+  },
+  {
+    id: '7',
+    name: 'Barra Chocolate Cinnamon (Chocolate Blanco)',
+    description: '15g Proteína • Sin azúcar • Cobertura Chocolate Blanco',
+    price: 1900,
+    image: require('../../assets/barras.jpg'),
     category: 'Barras'
   }
 ];
