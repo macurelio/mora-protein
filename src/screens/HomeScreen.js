@@ -1,33 +1,39 @@
 import React, { useContext, useState } from 'react';
-import { View, Text, StyleSheet, FlatList, Image, TouchableOpacity, Linking, Dimensions, ImageBackground } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, Image, TouchableOpacity, Linking, ImageBackground, useWindowDimensions } from 'react-native';
 import { products } from '../data/products';
-import { ShoppingCart, Instagram, Zap } from 'lucide-react-native';
+import { ShoppingCart, Instagram } from 'lucide-react-native';
 import { CartContext } from '../context/CartContext';
-
-const { width } = Dimensions.get('window');
 
 export default function HomeScreen({ navigation }) {
   const { addToCart, getCartCount } = useContext(CartContext);
   const [selectedCoverage, setSelectedCoverage] = useState({});
-  const [selectedCategory, setSelectedCategory] = useState('Todas');
+  const { width } = useWindowDimensions();
 
-  const categories = ['Todas', ...new Set(products.map((p) => p.category))];
-  const catalogData = selectedCategory === 'Todas'
-    ? products
-    : products.filter((p) => p.category === selectedCategory);
+  // Categorías extraídas automáticamente
+  const categories = [...new Set(products.map((p) => p.category))];
 
-  const renderItem = ({ item }) => {
+  // Hacer el diseño adaptable (responsive) para escritorio (web) y móvil
+  const columns = width > 1024 ? 4 : width > 768 ? 3 : 2;
+  // Calculamos el ancho de cada tarjeta basado en las columnas y márgenes
+  const containerPadding = 25; // padding total del contenedor (12.5 * 2)
+  const cardMargin = 15; // margen total por tarjeta (7.5 * 2)
+  const cardWidth = Math.floor((width - containerPadding - (cardMargin * columns)) / columns);
+
+  const renderProduct = (item) => {
     const coverage = selectedCoverage[item.id] || item.coverageOptions?.[0];
 
     return (
-      <TouchableOpacity style={styles.card} onPress={() => navigation.navigate('ProductDetail', { product: item })}>
+      <TouchableOpacity
+        key={item.id}
+        style={[styles.card, { width: cardWidth }]}
+        onPress={() => navigation.navigate('ProductDetail', { product: item })}
+      >
         <View style={styles.imageContainer}>
           <Image
             source={item.image}
             style={styles.productImage}
             resizeMode="cover"
           />
-          <View style={styles.overlay} />
         </View>
 
         <View style={styles.cardContent}>
@@ -66,76 +72,89 @@ export default function HomeScreen({ navigation }) {
         </View>
       </TouchableOpacity>
     );
-  };  
+  };
 
   const openInstagram = () => {
     Linking.openURL('https://www.instagram.com/mora.protein');
   };
 
   return (
-    <ImageBackground 
-      source={require('../../assets/fondo.jpg')} // Textura chocolate/barra
-      style={styles.backgroundImage}
-      resizeMode="cover"
-    >
-      <View style={styles.overlayContainer}>
-        <View style={styles.header}>
-          <View style={styles.logoContainer}>
-            <Text style={styles.brandMora}>Mora<Text style={styles.brandProtein}>Protein</Text></Text>
+    <View style={styles.mainContainer}>
+      <ImageBackground
+        source={require('../../assets/barras-fondo-snacks.png')}
+        style={styles.backgroundImage}
+        imageStyle={styles.imageOpacity}
+        resizeMode="cover"
+      >
+        <View style={styles.overlayContainer}>
+          <View style={styles.header}>
+            <View style={styles.logoContainer}>
+              <Text style={styles.brandMora}>Mora<Text style={styles.brandProtein}>Protein</Text></Text>
+            </View>
+            <View style={styles.headerIcons}>
+              <TouchableOpacity onPress={openInstagram} style={styles.iconButton}>
+                <Instagram color="#1A1A1A" size={24} />
+              </TouchableOpacity>
+              <TouchableOpacity onPress={() => navigation.navigate('Cart')} style={styles.iconButton}>
+                <View>
+                  <ShoppingCart color="#1A1A1A" size={24} />
+                  {getCartCount() > 0 && (
+                    <View style={styles.badgeContainer}>
+                      <Text style={styles.badgeText}>{getCartCount()}</Text>
+                    </View>
+                  )}
+                </View>
+              </TouchableOpacity>
+            </View>
           </View>
-          <View style={styles.headerIcons}>
-            <TouchableOpacity onPress={openInstagram} style={styles.iconButton}>
-              <Instagram color="#1A1A1A" size={24} />
-            </TouchableOpacity>
-            <TouchableOpacity onPress={() => navigation.navigate('Cart')} style={styles.iconButton}>
-              <View>
-                <ShoppingCart color="#1A1A1A" size={24} />
-                {getCartCount() > 0 && (
-                  <View style={styles.badgeContainer}>
-                    <Text style={styles.badgeText}>{getCartCount()}</Text>
-                  </View>
-                )}
-              </View>
-            </TouchableOpacity>
-          </View>
-        </View>
-        
-        <Text style={styles.sectionTitle}>Nuestros Productos</Text>
-        <View style={styles.categoryRow}>
-          {categories.map((category) => (
-            <TouchableOpacity
-              key={category}
-              onPress={() => setSelectedCategory(category)}
-              style={[styles.categoryChip, selectedCategory === category && styles.categoryChipActive]}
-            >
-              <Text style={[styles.categoryChipText, selectedCategory === category && styles.categoryChipTextActive]}>{category}</Text>
-            </TouchableOpacity>
-          ))}
-        </View>
 
-        <FlatList
-          data={catalogData}
-          renderItem={renderItem}
-          keyExtractor={item => item.id}
-          numColumns={2}
-          contentContainerStyle={styles.listContainer}
-          columnWrapperStyle={styles.rowWrapper}
-          showsVerticalScrollIndicator={false}
-        />
-      </View>
-    </ImageBackground>
+          <ScrollView
+            showsVerticalScrollIndicator={true}
+            contentContainerStyle={styles.scrollContent}
+          >
+            <View style={styles.titleContainer}>
+              <Text style={styles.mainTitle}>Nuestro Menú</Text>
+              <Text style={styles.subtitle}>Descubre todos nuestros snacks separadas por categoría.</Text>
+            </View>
+
+            {categories.map((category) => {
+              const categoryProducts = products.filter(p => p.category === category);
+              return (
+                <View key={category} style={styles.categorySection}>
+                  <View style={styles.categoryHeader}>
+                    <Text style={styles.categoryTitle}>{category}</Text>
+                    <View style={styles.categoryLine} />
+                  </View>
+
+                  <View style={styles.productsGrid}>
+                    {categoryProducts.map(product => renderProduct(product))}
+                  </View>
+                </View>
+              );
+            })}
+          </ScrollView>
+        </View>
+      </ImageBackground>
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
+  mainContainer: {
+    flex: 1,
+    backgroundColor: '#F9F8F6', // Color crema unificado como base
+  },
   backgroundImage: {
     flex: 1,
     width: '100%',
     height: '100%',
   },
+  imageOpacity: {
+    opacity: 0.55, // Aumentamos la opacidad para mayor nitidez
+  },
   overlayContainer: {
     flex: 1,
-    backgroundColor: 'rgba(249, 248, 246, 0.85)', // Semi-transparent premium cream
+    backgroundColor: 'rgba(249, 248, 246, 0.4)', // Velo crema claro para no perder la lectura de las tarjetas
   },
   header: {
     flexDirection: 'row',
@@ -143,24 +162,24 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     padding: 20,
     paddingTop: 50,
-    backgroundColor: 'rgba(255, 255, 255, 0.6)',
+    backgroundColor: 'rgba(249, 248, 246, 0.85)', // Adaptado para integrarse mejor
     borderBottomWidth: 1,
     borderBottomColor: 'rgba(235, 235, 235, 0.5)',
   },
   logoContainer: {
-    backgroundColor: '#D7CFC2', // Beige background from the image
+    backgroundColor: '#D7CFC2',
     paddingHorizontal: 8,
     paddingVertical: 4,
     borderRadius: 4,
   },
   brandMora: {
-    color: '#000000', // Black
+    color: '#000000',
     fontWeight: '900',
     fontSize: 26,
     letterSpacing: -1,
   },
   brandProtein: {
-    color: '#FFFFFF', // White
+    color: '#FFFFFF',
     fontWeight: '900',
     fontSize: 26,
     letterSpacing: -1,
@@ -189,32 +208,62 @@ const styles = StyleSheet.create({
     fontSize: 12,
     fontWeight: 'bold',
   },
-  sectionTitle: {
-    color: '#1A1A1A',
-    fontSize: 22,
-    fontWeight: 'bold',
-    marginLeft: 20,
-    marginTop: 25,
-    marginBottom: 5,
-  },
-  listContainer: {
-    padding: 10,
+  scrollContent: {
     paddingBottom: 40,
   },
-  rowWrapper: {
-    justifyContent: 'space-between',
-    paddingHorizontal: 5,
+  titleContainer: {
+    marginHorizontal: 20,
+    marginTop: 25,
+    marginBottom: 20,
+  },
+  mainTitle: {
+    color: '#1A1A1A',
+    fontSize: 28,
+    fontWeight: '900',
+    marginBottom: 5,
+  },
+  subtitle: {
+    color: '#666666',
+    fontSize: 14,
+  },
+  categorySection: {
+    marginBottom: 30,
+  },
+  categoryHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginHorizontal: 20,
+    marginBottom: 15,
+  },
+  categoryTitle: {
+    color: '#4a3c2f',
+    fontSize: 20,
+    fontWeight: '800',
+    marginRight: 10,
+    textTransform: 'uppercase',
+    letterSpacing: 1,
+  },
+  categoryLine: {
+    flex: 1,
+    height: 1,
+    backgroundColor: '#d6cdbf',
+    opacity: 0.6,
+  },
+  productsGrid: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    paddingHorizontal: 12.5,
   },
   card: {
-    backgroundColor: '#FFFFFF',
+    backgroundColor: 'rgba(255, 255, 255, 0.95)', // Muy leve transparencia para que se sienta moderno
     borderRadius: 16,
+    marginHorizontal: 7.5,
     marginBottom: 15,
-    width: (width / 2) - 25,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.05,
-    shadowRadius: 10,
-    elevation: 3,
+    shadowColor: '#4a3c2f',
+    shadowOffset: { width: 0, height: 6 },
+    shadowOpacity: 0.08,
+    shadowRadius: 12,
+    elevation: 4,
     overflow: 'hidden',
   },
   imageContainer: {
@@ -226,9 +275,6 @@ const styles = StyleSheet.create({
     width: '100%',
     height: 150,
     backgroundColor: '#F0F0F0',
-  },
-  overlay: {
-    display: 'none',
   },
   cardContent: {
     padding: 12,
@@ -301,34 +347,6 @@ const styles = StyleSheet.create({
     color: '#1A1A1A',
     fontSize: 16,
     fontWeight: 'bold',
-  },
-  categoryRow: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    marginHorizontal: 10,
-    marginBottom: 10,
-  },
-  categoryChip: {
-    borderWidth: 1,
-    borderColor: '#d6cdbf',
-    backgroundColor: '#fff',
-    paddingHorizontal: 10,
-    paddingVertical: 4,
-    borderRadius: 16,
-    marginRight: 8,
-    marginBottom: 8,
-  },
-  categoryChipActive: {
-    backgroundColor: '#1A1A1A',
-    borderColor: '#1A1A1A',
-  },
-  categoryChipText: {
-    color: '#4a4a4a',
-    fontSize: 12,
-    fontWeight: '700',
-  },
-  categoryChipTextActive: {
-    color: '#fff',
   },
   addButton: {
     backgroundColor: '#1A1A1A',
